@@ -3,18 +3,19 @@ import styled from "styled-components";
 
 export function App() {
   return (
-    <div>
+    <Container>
       <h1>hello App</h1>
-      <Button>hel</Button>
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Rem quos
-        delectus voluptatem ab repellat saepe eos molestiae cupiditate, omnis
-        doloremque, necessitatibus totam consectetur porro sint quam libero
-        aperiam? Laborum, quaerat?
-      </p>
-    </div>
+      <Button>click me</Button>
+      <p>hello</p>
+    </Container>
   );
 }
+
+const Container = styled.div`
+  width: 100vw;
+  height: 100vh;
+  background-color: red;
+`;
 
 const Button = styled.button`
   background: transparent;
