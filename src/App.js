@@ -6,6 +6,11 @@ export function App() {
   const [inputVal, setInputVal] = useState("");
   const [colNum, setColNum] = useState("");
   const [searchVal, setSearchVal] = useState("");
+  const handleAddAnItem = () => {
+    if (colNum === "") {
+      alert("Please select which column you want to add.");
+    }
+  };
 
   return (
     <Box>
@@ -39,7 +44,9 @@ export function App() {
               <Option value="col1">COLUMN 1</Option>
               <Option value="col2">COLUMN 2</Option>
             </Select>
-            <AddItemButton>ADD ITEM</AddItemButton>
+            <AddItemButton onClick={() => handleAddAnItem()}>
+              ADD ITEM
+            </AddItemButton>
             <SearchWrapper>
               <SearchText>SEARCH AN ITEM</SearchText>
               <Search
