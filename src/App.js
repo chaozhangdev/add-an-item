@@ -1,15 +1,42 @@
 import React from "react";
 import { useState } from "react";
+import { useEffect } from "react";
 import styled from "styled-components";
 
 export function App() {
+  useEffect(() => {
+    if (!localStorage.getItem("col1")) {
+      localStorage.setItem("col1", JSON.stringify([]));
+    }
+    if (!localStorage.getItem("col2")) {
+      localStorage.setItem("col2", JSON.stringify([]));
+    }
+  }, []);
+
   const [inputVal, setInputVal] = useState("");
   const [colNum, setColNum] = useState("");
   const [searchVal, setSearchVal] = useState("");
+
   const handleAddAnItem = () => {
+    if (inputVal === "") {
+      alert("Item can not be empty.");
+      return;
+    }
     if (colNum === "") {
       alert("Please select which column you want to add.");
+      return;
     }
+    let whichCol = colNum === "col1" ? "col1" : "col2";
+    let data = JSON.parse(localStorage.getItem(whichCol));
+    data.push(inputVal);
+    localStorage.setItem(whichCol, JSON.stringify(data));
+    location.reload();
+  };
+
+  const handleRemoveAllItem = () => {
+    localStorage.setItem("col1", JSON.stringify([]));
+    localStorage.setItem("col2", JSON.stringify([]));
+    location.reload();
   };
 
   return (
@@ -21,9 +48,6 @@ export function App() {
           and typesetting industy. Lorem Ipsum has been <br />
           the industry's standard dummy text ever since.
         </IntroText>
-        <p>{inputVal}</p>
-        <p>{colNum}</p>
-        <p>{searchVal}</p>
         <Header>ADD AN ITEM</Header>
         <Content>
           <Left>
@@ -44,9 +68,10 @@ export function App() {
               <Option value="col1">COLUMN 1</Option>
               <Option value="col2">COLUMN 2</Option>
             </Select>
-            <AddItemButton onClick={() => handleAddAnItem()}>
-              ADD ITEM
-            </AddItemButton>
+            <Button onClick={() => handleAddAnItem()}>ADD ITEM</Button>
+            <Button onClick={() => handleRemoveAllItem()}>
+              REMOVE ALL ITEM
+            </Button>
             <SearchWrapper>
               <SearchText>SEARCH AN ITEM</SearchText>
               <Search
@@ -62,6 +87,7 @@ export function App() {
             <ColWrapper>
               <Col1>
                 <ColTitle>COLUMN 1</ColTitle>
+                <p>{localStorage.getItem("col1")}</p>
                 <Item>
                   <ItemText>ITEM</ItemText>
                   <ItemX>X</ItemX>
@@ -69,6 +95,7 @@ export function App() {
               </Col1>
               <Col2>
                 <ColTitle>COLUMN 2</ColTitle>
+                <p>{localStorage.getItem("col2")}</p>
                 <Item>
                   <ItemText>ITEM</ItemText>
                   <ItemX>X</ItemX>
@@ -161,16 +188,16 @@ const Option = styled.option`
   font-size: 16px;
 `;
 
-const AddItemButton = styled.div`
+const Button = styled.div`
   border: 2px solid #fff;
   outline: none;
   padding: 15px;
   width: 95%;
   font-size: 16px;
-  margin-bottom: 10px;
+
   text-align: center;
   color: #fff;
-  margin-bottom: 100px;
+  margin-bottom: 10px;
   :hover {
     cursor: pointer;
   }
@@ -178,6 +205,7 @@ const AddItemButton = styled.div`
 
 const SearchWrapper = styled.div`
   position: relative;
+  margin-top: 40px;
 `;
 
 const SearchText = styled.p`
