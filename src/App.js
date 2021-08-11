@@ -11,6 +11,12 @@ export function App() {
     if (!localStorage.getItem("col2")) {
       localStorage.setItem("col2", JSON.stringify([]));
     }
+    if (localStorage.getItem("colNum")) {
+      setColNum(localStorage.getItem("colNum"));
+    }
+    if (localStorage.getItem("searchValue")) {
+      setSearchVal(localStorage.getItem("searchValue"));
+    }
   }, []);
 
   const [inputVal, setInputVal] = useState("");
@@ -26,6 +32,7 @@ export function App() {
       alert("Please select which column you want to add.");
       return;
     }
+    // push item into col1 or col2 array (local storage)
     let whichCol = colNum === "col1" ? "col1" : "col2";
     let data = JSON.parse(localStorage.getItem(whichCol));
     data.push(inputVal);
@@ -36,7 +43,46 @@ export function App() {
   const handleRemoveAllItem = () => {
     localStorage.setItem("col1", JSON.stringify([]));
     localStorage.setItem("col2", JSON.stringify([]));
+    localStorage.setItem("colNum", "");
     location.reload();
+  };
+
+  const handleColChange = (value) => {
+    setColNum(value);
+    localStorage.setItem("colNum", value);
+  };
+
+  const handleItemRemove = (parentDiv, whichCol) => {
+    let value = parentDiv.getElementsByTagName("p")[0].innerText;
+    let colData = JSON.parse(localStorage.getItem(whichCol));
+    let newColData = colData.filter((el) => el !== value);
+    localStorage.setItem(whichCol, JSON.stringify(newColData));
+    location.reload();
+  };
+
+  const renderColContent = (arr, whichCol) => {
+    if (arr) {
+      return arr.map((el, index) => (
+        <Item key={index} isLight={index % 2 === 0}>
+          <ItemText>{el}</ItemText>
+          <ItemX
+            isLight={index % 2 === 0}
+            onClick={(e) => handleItemRemove(e.target.parentElement, whichCol)}
+          >
+            X
+          </ItemX>
+        </Item>
+      ));
+    }
+  };
+
+  const handleSearch = (value) => {
+    setSearchVal(value);
+    localStorage.setItem("searchValue", value);
+  };
+
+  const filterSearchData = (arr) => {
+    return arr.filter((el) => el.includes(searchVal));
   };
 
   return (
@@ -58,8 +104,9 @@ export function App() {
               }}
             ></Input>
             <Select
+              value={colNum}
               onChange={(e) => {
-                setColNum(e.target.value);
+                handleColChange(e.target.value);
               }}
             >
               <Option value="" disabled selected>
@@ -75,9 +122,10 @@ export function App() {
             <SearchWrapper>
               <SearchText>SEARCH AN ITEM</SearchText>
               <Search
+                value={searchVal}
                 placeholder="SEARCH"
                 onChange={(e) => {
-                  setSearchVal(e.target.value);
+                  handleSearch(e.target.value);
                 }}
               ></Search>
               <SearchImage src="https://github.com/chaozhangdev/src/blob/master/search.png?raw=true" />
@@ -87,19 +135,31 @@ export function App() {
             <ColWrapper>
               <Col1>
                 <ColTitle>COLUMN 1</ColTitle>
-                <p>{localStorage.getItem("col1")}</p>
-                <Item>
-                  <ItemText>ITEM</ItemText>
-                  <ItemX>X</ItemX>
-                </Item>
+                {searchVal === ""
+                  ? renderColContent(
+                      JSON.parse(localStorage.getItem("col1")),
+                      "col1"
+                    )
+                  : renderColContent(
+                      filterSearchData(
+                        JSON.parse(localStorage.getItem("col1"))
+                      ),
+                      "col1"
+                    )}
               </Col1>
               <Col2>
                 <ColTitle>COLUMN 2</ColTitle>
-                <p>{localStorage.getItem("col2")}</p>
-                <Item>
-                  <ItemText>ITEM</ItemText>
-                  <ItemX>X</ItemX>
-                </Item>
+                {searchVal === ""
+                  ? renderColContent(
+                      JSON.parse(localStorage.getItem("col2")),
+                      "col2"
+                    )
+                  : renderColContent(
+                      filterSearchData(
+                        JSON.parse(localStorage.getItem("col2"))
+                      ),
+                      "col2"
+                    )}
               </Col2>
             </ColWrapper>
           </Right>
@@ -251,8 +311,8 @@ const Item = styled.div`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  background-color: #f2f3f4;
-  color: #79818f;
+  background-color: ${(props) => (props.isLight ? "#f2f3f4" : "#BCC0C7")};
+  color: ${(props) => (props.isLight ? "#79818f" : "#fff")};
   padding: 10px 30px;
   /* #BCC0C7  */
 `;
@@ -261,7 +321,8 @@ const ItemText = styled.p``;
 
 const ItemX = styled.p`
   font-size: 14px;
-  border: 1px solid #79818f;
+  border: 1px solid;
+  border-color: ${(props) => (props.isLight ? "#79818f" : "#fff")};
   border-radius: 8px;
   padding: 5px 10px;
   :hover {
