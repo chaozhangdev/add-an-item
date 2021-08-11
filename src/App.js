@@ -4,6 +4,9 @@ import { useEffect } from "react";
 import styled from "styled-components";
 
 export function App() {
+  /**
+   * init values from localStorage before mounted
+   */
   useEffect(() => {
     if (!localStorage.getItem("col1")) {
       localStorage.setItem("col1", JSON.stringify([]));
@@ -19,10 +22,24 @@ export function App() {
     }
   }, []);
 
+  /**
+   * @param {inputVal} string add an item input text
+   * @param {colNum} string column selector
+   * @param {searchVal} string search input text
+   */
   const [inputVal, setInputVal] = useState("");
   const [colNum, setColNum] = useState("");
   const [searchVal, setSearchVal] = useState("");
 
+  /**
+   * @method handleAddAnItem()
+   * pre-check1: if the item input is empty
+   * pre-check2: if the col seletor has been selected
+   * process:
+   * step 1 - get the col1 or col2 from localStorage
+   * step 2 - update the value in localStorage
+   * step 3 - reload the page to show the changes
+   */
   const handleAddAnItem = () => {
     if (inputVal === "") {
       alert("Item can not be empty.");
@@ -32,7 +49,6 @@ export function App() {
       alert("Please select which column you want to add.");
       return;
     }
-    // push item into col1 or col2 array (local storage)
     let whichCol = colNum === "col1" ? "col1" : "col2";
     let data = JSON.parse(localStorage.getItem(whichCol));
     data.push(inputVal);
@@ -40,6 +56,10 @@ export function App() {
     location.reload();
   };
 
+  /**
+   * @method handleRemoveAllItem()
+   * clean localStorage data
+   */
   const handleRemoveAllItem = () => {
     localStorage.setItem("col1", JSON.stringify([]));
     localStorage.setItem("col2", JSON.stringify([]));
@@ -47,11 +67,26 @@ export function App() {
     location.reload();
   };
 
+  /**
+   * @method handleColChange()
+   * @param {value} string
+   * set the current col num value
+   * update the localStorage
+   */
   const handleColChange = (value) => {
     setColNum(value);
     localStorage.setItem("colNum", value);
   };
 
+  /**
+   * @method handleItemRemove()
+   * @param {parentDiv} HTMLdiv
+   * @param {whichCol} string
+   * process:
+   * step 1: get the parent html div
+   * step 2: find the first `p` tag which is the item text(the second is 'X' icon)
+   * step 3: filter the string fron the array and update the localStorage
+   */
   const handleItemRemove = (parentDiv, whichCol) => {
     let value = parentDiv.getElementsByTagName("p")[0].innerText;
     let colData = JSON.parse(localStorage.getItem(whichCol));
@@ -60,6 +95,16 @@ export function App() {
     location.reload();
   };
 
+  /**
+   * @method renderColContent()
+   * @param {arr} array
+   * @param {whichCol} string
+   * @param {isLight} boolean
+   * process:
+   * step 1: whichCol shows col 1 or col 2 to render
+   * step 2: map each item in col array and render the JSX content
+   * noet: `isLight` is style component props to control the color & bgColor
+   */
   const renderColContent = (arr, whichCol) => {
     if (arr) {
       return arr.map((el, index) => (
@@ -76,11 +121,21 @@ export function App() {
     }
   };
 
+  /**
+   * @method handleSearch()
+   * @param {value} string
+   * remove the front space by trimStart
+   */
   const handleSearch = (value) => {
-    setSearchVal(value);
+    setSearchVal(value.trimStart());
     localStorage.setItem("searchValue", value);
   };
 
+  /**
+   * @method filterSearchData()
+   * @param {arr} string
+   * filter the search text in the col array
+   */
   const filterSearchData = (arr) => {
     return arr.filter((el) => el.includes(searchVal));
   };
@@ -174,11 +229,20 @@ const Box = styled.div`
   height: 100vh;
   background-color: #79818f;
   padding-top: 40px;
+  @media (max-width: 768px) {
+    width: 100%;
+    height: 100%;
+  }
 `;
 
 const Container = styled.div`
   width: 800px;
+  height: 100%;
   margin: auto;
+  @media (max-width: 768px) {
+    width: 100%;
+    padding: 20px;
+  }
 `;
 
 const Title = styled.i`
@@ -209,14 +273,23 @@ const Content = styled.div`
   width: 100%;
   display: flex;
   flex-direction: row;
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 
 const Left = styled.div`
   width: 33%;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const Right = styled.div`
   width: 67%;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const Input = styled.input`
@@ -228,6 +301,9 @@ const Input = styled.input`
   font-size: 16px;
   margin-bottom: 10px;
   color: #fff;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const Select = styled.select`
@@ -242,6 +318,9 @@ const Select = styled.select`
   :hover {
     cursor: pointer;
   }
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const Option = styled.option`
@@ -254,12 +333,14 @@ const Button = styled.div`
   padding: 15px;
   width: 95%;
   font-size: 16px;
-
   text-align: center;
   color: #fff;
   margin-bottom: 10px;
   :hover {
     cursor: pointer;
+  }
+  @media (max-width: 768px) {
+    width: 100%;
   }
 `;
 
@@ -289,16 +370,25 @@ const ColWrapper = styled.div`
   display: flex;
   flex-direction: row;
   border: 2px solid #fff;
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 
 const Col1 = styled.div`
   width: 50%;
   border: 2px solid #fff;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const Col2 = styled.div`
   width: 50%;
   border: 2px solid #fff;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const ColTitle = styled(Header)`
